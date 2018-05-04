@@ -14,7 +14,6 @@ defined( 'ABSPATH' ) or die();
 
 define( 'GF_AUTOMATIC_CSV_VERSION', '0.3.2' );
 
-// require 'api.php';
 
 class GravityFormsAutomaticCSVExport {
 
