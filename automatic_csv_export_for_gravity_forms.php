@@ -27,7 +27,14 @@ class GravityFormsAutomaticCSVExport {
 
 			global $wpdb;
 			$prefix = $wpdb->prefix;
-			$forms = $wpdb->get_results( "SELECT * FROM " . $prefix . "gf_form_meta" );
+			$table_name = $prefix . "gf_form_meta";
+
+			// Check if Table exists in Database
+			if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name ) {
+				$forms = $wpdb->get_results( "SELECT * FROM " . $prefix . "gf_form_meta" );
+			} else {
+				$forms = $wpdb->get_results( "SELECT * FROM " . $prefix . "rg_form_meta" );
+			}
 
 			foreach ( $forms as $form ) {
 				$form_id = $form->form_id;
