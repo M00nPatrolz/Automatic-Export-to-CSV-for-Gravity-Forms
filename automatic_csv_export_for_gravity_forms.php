@@ -21,9 +21,9 @@ class GravityFormsAutomaticCSVExport {
 
 		if ( class_exists( 'GFAPI' ) ) {
 
-			add_filter( 'cron_schedules', array($this, 'add_weekly' ) );
-			add_filter( 'cron_schedules', array($this, 'add_monthly' ) );
-			add_action( 'admin_init', array($this, 'gforms_create_schedules' ) );
+			add_filter( 'cron_schedules', array( $this, 'add_weekly' ) );
+			add_filter( 'cron_schedules', array( $this, 'add_monthly' ) );
+			add_action( 'admin_init', array( $this, 'gforms_create_schedules' ) );
 
 			global $wpdb;
 			$prefix = $wpdb->prefix;
@@ -107,13 +107,8 @@ class GravityFormsAutomaticCSVExport {
 
 				$form = GFAPI::get_form( $form_id );
 
-				// if event is scheduled
-				if ( wp_next_scheduled( 'csv_export_' . $form_id ) ) {
-					$timestamp = wp_next_scheduled( 'csv_export_' . $form_id );
-					wp_unschedule_event( $timestamp, 'csv_export_' . $form_id );
-				}
-				//event is not scheduled
-				else {
+				// If event is Not scheduled
+				if ( ! wp_next_scheduled( 'csv_export_' . $form_id ) ) {
 					$frequency = $form['automatic_csv_export_for_gravity_forms']['csv_export_frequency'];
 					wp_schedule_event( time(), $frequency, 'csv_export_' . $form_id );
 				}
@@ -152,17 +147,17 @@ class GravityFormsAutomaticCSVExport {
 
 		if ( $form['automatic_csv_export_for_gravity_forms']['search_criteria'] == 'previous_week' ) {
 
-			$search_criteria['start_date'] = date('Y-m-d', time() - 604800 );
+			$search_criteria['start_date'] = date( 'Y-m-d', time() - 604800 );
 
-			$search_criteria['end_date'] = date('Y-m-d', time() - 60 * 60 * 24 );
+			$search_criteria['end_date'] = date( 'Y-m-d', time() - 60 * 60 * 24 );
 
 		}
 
 		if ( $form['automatic_csv_export_for_gravity_forms']['search_criteria'] == 'previous_month' ) {
 
-			$search_criteria['start_date'] = date('Y-m-d', time() - 18144000 );
+			$search_criteria['start_date'] = date( 'Y-m-d', time() - 18144000 );
 
-			$search_criteria['end_date'] = date('Y-m-d', time() - 60 * 60 * 24 );
+			$search_criteria['end_date'] = date( 'Y-m-d', time() - 60 * 60 * 24 );
 
 		}
 
@@ -186,14 +181,18 @@ class GravityFormsAutomaticCSVExport {
 
 		$baseurl = $upload_dir['baseurl'];
 
-		$path = $upload_dir['path'];
+		$path = $upload_dir['basedir'];
+
+		error_log( print_r( $upload_dir , true ) );
 
 		$server = $_SERVER['HTTP_HOST'];
 
 		$email_address = $form['automatic_csv_export_for_gravity_forms']['email_address'];
 
 		// Send an email using the latest csv file
-		$attachments = $path . '/export-' . $form_id . '-' . date('Y-m-d-giA') . '.csv';
+		$attachments = $path . '/gravity_forms/export/export-' . $form_id . '-' . date('Y-m-d-giA') . '.csv';
+
+		error_log( $attachments );
 
 		$headers[] = 'From: WordPress <wordpress@' . $server . '>';
 		//$headers[] = 'Bcc: bcc@yourdomain.com';
