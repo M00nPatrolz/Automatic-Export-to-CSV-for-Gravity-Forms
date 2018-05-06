@@ -45,5 +45,5 @@ Once the plugin is installed and activated, you can enable an automated export f
 6. Enter the email address you would like the export sent to.
 7. Click "Update Settings" to save your settings.
 
-![Screenshot]()
+![Screenshot](screenshot.png)
 
