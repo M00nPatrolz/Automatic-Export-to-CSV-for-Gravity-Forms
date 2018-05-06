@@ -188,7 +188,7 @@ class GravityFormsAutomaticCSVExport {
 		$email_address = $form['automatic_csv_export_for_gravity_forms']['email_address'];
 
 		// Send an email using the latest csv file
-		$attachments = $path . '/gravity_forms/export/export-' . $form_id . '-' . date('Y-m-d-giA') . '.csv';
+		$attachments = $path . '/export-' . $form_id . '-' . date('Y-m-d-giA') . '.csv';
 
 		$headers[] = 'From: WordPress <wordpress@' . $server . '>';
 		//$headers[] = 'Bcc: bcc@yourdomain.com';
