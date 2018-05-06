@@ -23,7 +23,7 @@ class GravityFormsAutomaticCSVExport {
 
 			add_filter( 'cron_schedules', array($this, 'add_weekly' ) );
 			add_filter( 'cron_schedules', array($this, 'add_monthly' ) );
-			add_action( 'admin_init', array($this, 'gforms_create_schedules' ) );
+			// add_action( 'admin_init', array($this, 'gforms_create_schedules' ) );
 
 			global $wpdb;
 			$prefix = $wpdb->prefix;
@@ -41,15 +41,13 @@ class GravityFormsAutomaticCSVExport {
 				$display_meta = $form->display_meta;
 				$decode = json_decode( $display_meta );
 
-				if (!empty($decode) && isset($decode->automatic_csv_export_for_gravity_forms)) {
-					if ($decode->automatic_csv_export_for_gravity_forms->enabled == 1) {
-						add_action('csv_export_' . $form_id, array( $this, 'gforms_automated_export' ));
+				if ( !empty( $decode ) && isset( $decode->automatic_csv_export_for_gravity_forms ) ) {
+					if ( $decode->automatic_csv_export_for_gravity_forms->enabled == 1 ) {
+						add_action( 'csv_export_' . $form_id, array( $this, 'gforms_automated_export' ) );
 					}
 				}
 			}
-
 		}
-
 	}
 
 
@@ -101,26 +99,31 @@ class GravityFormsAutomaticCSVExport {
 
 		$forms = GFAPI::get_forms();
 
-		foreach ($forms as $form) {
+		foreach ( $forms as $form ) {
 
 			$form_id = $form['id'];
 
-			if (isset($form['automatic_csv_export_for_gravity_forms'])
-				&& $form['automatic_csv_export_for_gravity_forms']['enabled'] == 1) {
+			if ( isset( $form['automatic_csv_export_for_gravity_forms'] ) && $form['automatic_csv_export_for_gravity_forms']['enabled'] == 1 ) {
 
-				$form = GFAPI::get_form($form_id);
+				$form = GFAPI::get_form( $form_id );
 
-				if (wp_next_scheduled('csv_export_' . $form_id)) {
+				// if event is scheduled
+				if ( wp_next_scheduled( 'csv_export_' . $form_id ) ) {
 
-					$timestamp = wp_next_scheduled('csv_export_' . $form_id);
+					$timestamp = wp_next_scheduled( 'csv_export_' . $form_id );
 
-					wp_unschedule_event($timestamp, 'csv_export_' . $form_id);
+					wp_unschedule_event( $timestamp, 'csv_export_' . $form_id );
 
+				} else {
+
+					//event is not scheduled
+
+					$frequency = $form['automatic_csv_export_for_gravity_forms']['csv_export_frequency'];
+
+					wp_schedule_event( time(), $frequency, 'csv_export_' . $form_id );
 				}
 
-				$frequency = $form['automatic_csv_export_for_gravity_forms']['csv_export_frequency'];
 
-				wp_schedule_event(time(), $frequency, 'csv_export_' . $form_id);
 
 			}
 		}
